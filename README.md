@@ -3,7 +3,7 @@
 이 저장소는 **ePub.js**를 이용한 웹 기반 전자책(ePub) 뷰어입니다.
 
 배포 주소:
-🔗 [바로가기](https://username.github.io/ebook-viewer/)
+🔗 [바로가기]([https://github.com/MOONSOOLEE1981/my-epub-viewer.git))
 
 ---
 
