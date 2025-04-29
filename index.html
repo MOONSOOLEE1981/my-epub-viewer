@@ -1,0 +1,154 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>내 전자책 뷰어 - 최강 복제방지 버전</title>
+    <script src="https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #fff;
+            color: #000;
+            user-select: none; /* 드래그 차단 */
+        }
+        #controls {
+            padding: 10px;
+            background: #f0f0f0;
+            text-align: center;
+        }
+        #controls button {
+            margin: 0 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        #viewer {
+            width: 100%;
+            height: 80vh;
+            border-top: 1px solid #ccc;
+            overflow: hidden;
+        }
+        #toc {
+            display: none;
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 999;
+            padding: 10px;
+        }
+        #watermark {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            opacity: 0.5;
+            font-size: 14px;
+            color: #aaa;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .blurred {
+            filter: blur(10px);
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;"> <!-- 마우스 우클릭 차단 -->
+
+<div id="controls">
+    <button onclick="prevPage()">이전 페이지</button>
+    <button onclick="nextPage()">다음 페이지</button>
+    <button onclick="toggleDarkMode()">다크모드 토글</button>
+    <button onclick="toggleToc()">목차 열기</button>
+</div>
+
+<div id="viewer"></div>
+
+<div id="toc"></div>
+
+<div id="watermark"></div>
+
+<script>
+    // 가짜 로그인 사용자 ID 설정 (실제 로그인 시스템이 있다면 여기에 연결)
+    const userId = "demo@domain.com";
+
+    // 현재 시간 가져오기
+    function getCurrentTime() {
+        const now = new Date();
+        return now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() +
+               " " + now.getHours() + ":" + now.getMinutes();
+    }
+
+    // 워터마크 설정
+    const watermarkDiv = document.getElementById("watermark");
+    watermarkDiv.textContent = "사용자: " + userId + " (" + getCurrentTime() + ")";
+
+    const book = ePub("book.epub");
+    const rendition = book.renderTo("viewer", {
+        width: "100%",
+        height: "100%",
+    });
+    rendition.display();
+
+    function nextPage() {
+        rendition.next();
+    }
+
+    function prevPage() {
+        rendition.prev();
+    }
+
+    function toggleDarkMode() {
+        document.body.classList.toggle("dark-mode");
+    }
+
+    function toggleToc() {
+        const tocDiv = document.getElementById("toc");
+        if (tocDiv.style.display === "none" || tocDiv.style.display === "") {
+            tocDiv.style.display = "block";
+        } else {
+            tocDiv.style.display = "none";
+        }
+    }
+
+    book.loaded.navigation.then(function(toc) {
+        const tocElement = document.getElementById("toc");
+        toc.toc.forEach(function(chapter) {
+            const item = document.createElement("div");
+            item.textContent = chapter.label;
+            item.style.cursor = "pointer";
+            item.onclick = function() {
+                rendition.display(chapter.href);
+                toggleToc();
+            };
+            tocElement.appendChild(item);
+        });
+    });
+
+    // 복사 차단
+    document.addEventListener('copy', function (e) {
+        e.preventDefault();
+        alert('복사할 수 없습니다.');
+    });
+    document.addEventListener('selectstart', function (e) {
+        e.preventDefault();
+    });
+
+    // 화면 캡처 감지 (PrintScreen 키 감지)
+    window.addEventListener('keyup', function (e) {
+        if (e.key === 'PrintScreen') {
+            alert('화면 캡처가 제한됩니다. 다시 접속해 주세요.');
+            location.reload(); // 강제 새로고침
+        }
+    });
+
+</script>
+
+</body>
+</html>
