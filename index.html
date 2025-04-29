@@ -89,7 +89,7 @@
     const watermarkDiv = document.getElementById("watermark");
     watermarkDiv.textContent = "사용자: " + userId + " (" + getCurrentTime() + ")";
 
-    const book = ePub("1장-기후-혼돈.epub");
+    const book = ePub("sample.epub");
     const rendition = book.renderTo("viewer", {
         width: "100%",
         height: "100%",
